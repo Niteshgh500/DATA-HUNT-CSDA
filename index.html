@@ -199,6 +199,60 @@ body::before{
   transition:.2s;
 }
 .input-row input:focus{border-color:var(--neon-purple);box-shadow:0 0 0 3px rgba(255,122,69,.2);}
+/* --- solo / group registration --- */
+.mode-toggle{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
+.mode-opt{
+  background:var(--ink);
+  border:1px solid rgba(255,122,69,.35);
+  border-radius:11px;
+  padding:14px 10px;
+  cursor:pointer;
+  text-align:center;
+  transition:.18s;
+  font-family:var(--font-mono);
+}
+.mode-opt:hover{border-color:var(--neon-purple);transform:translateY(-1px);}
+.mode-opt .mode-icon{font-size:22px;display:block;margin-bottom:5px;}
+.mode-opt .mode-name{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#fff;}
+.mode-opt .mode-sub{font-size:9.5px;letter-spacing:.5px;color:var(--mist);opacity:.75;margin-top:3px;}
+.mode-opt.active{
+  border-color:var(--gold);
+  background:linear-gradient(180deg, rgba(247,201,72,.14), rgba(247,201,72,.04));
+  box-shadow:0 0 0 3px rgba(247,201,72,.16);
+}
+.mode-opt.active .mode-name{color:var(--gold);}
+.member-row{display:grid;grid-template-columns:1fr 1.25fr auto;gap:8px;margin-bottom:8px;align-items:center;}
+.member-row input{
+  background:var(--ink);border:1px solid rgba(255,122,69,.4);border-radius:9px;
+  padding:9px 11px;color:#fff;font-family:var(--font-body);font-size:13px;outline:none;transition:.2s;width:100%;
+}
+.member-row input:focus{border-color:var(--neon-purple);box-shadow:0 0 0 3px rgba(255,122,69,.2);}
+.member-row input.bad{border-color:#ff6b6b;box-shadow:0 0 0 3px rgba(255,107,107,.18);}
+.member-del{
+  background:transparent;border:1px solid rgba(255,122,69,.35);border-radius:8px;color:var(--mist);
+  width:32px;height:34px;cursor:pointer;font-size:15px;line-height:1;transition:.18s;
+}
+.member-del:hover{border-color:#ff6b6b;color:#ff6b6b;}
+.member-head{
+  display:grid;grid-template-columns:1fr 1.25fr auto;gap:8px;margin-bottom:6px;
+  font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--neon-cyan);
+  text-align:left;padding-left:2px;
+}
+.member-head span:last-child{width:32px;}
+.add-member{
+  background:transparent;border:1px dashed rgba(255,122,69,.45);border-radius:9px;color:var(--neon-purple);
+  padding:9px;width:100%;cursor:pointer;font-family:var(--font-mono);font-size:11px;letter-spacing:1px;
+  text-transform:uppercase;transition:.18s;margin-top:2px;
+}
+.add-member:hover{border-color:var(--gold);color:var(--gold);}
+.form-error{
+  color:#ff9b9b;font-family:var(--font-mono);font-size:11px;line-height:1.6;
+  margin:-8px 0 12px;min-height:0;text-align:left;
+}
+@media(max-width:520px){
+  .member-row, .member-head{grid-template-columns:1fr 1fr auto;}
+  .member-row input{font-size:12px;padding:8px 9px;}
+}
 .btn{
   font-family:var(--font-mono);
   font-weight:700;
@@ -790,24 +844,56 @@ footer{text-align:center;font-family:var(--font-mono);font-size:10.5px;color:var
   <div id="startScreen">
     <h2>⚓ Chart Your Course</h2>
     <p>100 student records are hidden across 7 islands. Download each island's dataset, analyze it, and enter the correct <b>Reg. No.</b> to unlock the next. Reach Treasure Island before the clock runs out.</p>
-    <div style="max-width:420px;margin:0 auto;">
-      <div class="input-row">
-        <label>Team / Player Name</label>
-        <input type="text" id="teamNameInput" placeholder="e.g. The Data Pirates" maxlength="24">
+    <div style="max-width:460px;margin:0 auto;">
+
+      <div class="input-row" style="margin-bottom:10px;">
+        <label>Are you playing solo or as a group?</label>
       </div>
+      <div class="mode-toggle">
+        <div class="mode-opt active" id="modeSolo" role="button" tabindex="0">
+          <span class="mode-icon">🧑‍💻</span>
+          <span class="mode-name">Solo</span>
+          <div class="mode-sub">Just me</div>
+        </div>
+        <div class="mode-opt" id="modeGroup" role="button" tabindex="0">
+          <span class="mode-icon">👥</span>
+          <span class="mode-name">Group</span>
+          <div class="mode-sub">2 – 6 players</div>
+        </div>
+      </div>
+
+      <div id="soloFields">
+        <div class="input-row">
+          <label>Your Name</label>
+          <input type="text" id="soloName" placeholder="e.g. Nitesh Kumar" maxlength="40" autocomplete="name">
+        </div>
+        <div class="input-row">
+          <label>Your Email ID</label>
+          <input type="email" id="soloEmail" placeholder="e.g. you@gmail.com" maxlength="60" autocomplete="email">
+        </div>
+      </div>
+
+      <div id="groupFields" style="display:none;">
+        <div class="input-row">
+          <label>Team Name</label>
+          <input type="text" id="teamNameInput" placeholder="e.g. The Data Pirates" maxlength="24">
+        </div>
+        <div class="input-row" style="margin-bottom:8px;">
+          <label>Team Members</label>
+        </div>
+        <div class="member-head"><span>Name</span><span>Email ID</span><span></span></div>
+        <div id="memberList"></div>
+        <button type="button" class="add-member" id="addMemberBtn">+ Add member</button>
+        <div style="height:16px;"></div>
+      </div>
+
+      <div class="form-error" id="formError"></div>
+
       <button class="btn btn-block" id="startBtn">Begin the Hunt →</button>
       <button class="btn secondary btn-block" id="howToPlayBtn" style="margin-top:10px;">❓ How to Play</button>
     </div>
 
-    <div class="lb-scoring-grid">
-      <div class="lb-card">
-        <div style="display:flex;align-items:center;justify-content:space-between;">
-          <h3>🏆 Leaderboard</h3>
-          <button class="btn secondary" id="refreshLbBtn" style="padding:6px 10px;font-size:10px;">↻ Refresh</button>
-        </div>
-        <div class="card-subtext">Top runs from this hunt</div>
-        <div id="startLeaderboardList"><div class="lb-empty">Loading…</div></div>
-      </div>
+    <div class="lb-scoring-grid" style="grid-template-columns:1fr;">
       <div class="scoring-card">
         <h3>⚡ Scoring System</h3>
         <div class="card-subtext">How points are earned</div>
@@ -1051,10 +1137,6 @@ footer{text-align:center;font-family:var(--font-mono);font-size:10.5px;color:var
         <div class="scoring-row"><span class="s-label">⚡ Fast Completion Bonus</span><span class="pts pos">+50</span></div>
         <div class="max-score-row">Max Score: <span id="maxScoreValGame">750</span></div>
       </div>
-      <div class="lb-card" style="grid-column:1 / -1;">
-        <h3>🏆 Leaderboard</h3>
-        <div id="leaderboardList"><div class="lb-empty">Loading…</div></div>
-      </div>
       <div class="panel" id="skippedPanel" style="display:none;grid-column:1 / -1;">
         <h3>⏭ Skipped Islands — come back anytime</h3>
         <div id="skippedList" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
@@ -1065,7 +1147,7 @@ footer{text-align:center;font-family:var(--font-mono);font-size:10.5px;color:var
   <div id="winScreen">
     <div class="chest">🏆💰</div>
     <h2>TREASURE FOUND!</h2>
-    <p style="opacity:.85;">You've explored every location on the map and claimed the treasure.</p>
+    <p style="opacity:.85;" id="winSubtitle">You've explored every location on the map and claimed the treasure.</p>
     <div class="panel" style="text-align:left;max-width:340px;margin:18px auto;">
       <h3 style="margin-bottom:8px;">Final Report</h3>
       <div style="font-family:var(--font-mono);font-size:13px;line-height:1.9;" id="finalStats"></div>
@@ -1076,10 +1158,10 @@ footer{text-align:center;font-family:var(--font-mono);font-size:10.5px;color:var
       <div id="badgesList" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
     </div>
 
-    <div class="lb-card" id="winLeaderboardPanel" style="text-align:left;max-width:420px;margin:18px auto;">
-      <h3 style="margin-bottom:4px;">🏆 Leaderboard</h3>
-      <div class="card-subtext" id="winLbSubtext">Your run is highlighted below</div>
-      <div id="winLeaderboardList"><div class="lb-empty">Loading…</div></div>
+    <div class="lb-card" id="submitPanel" style="text-align:left;max-width:420px;margin:18px auto;">
+      <h3 style="margin-bottom:4px;">📤 Result Submission</h3>
+      <div class="card-subtext" id="submitStatus">Sending your score to the organizer…</div>
+      <div id="submitDetail" style="font-family:var(--font-mono);font-size:11.5px;line-height:1.8;margin-top:8px;opacity:.85;"></div>
     </div>
 
     <button class="btn gold" id="playAgainBtn">Explore Again</button>
@@ -1156,8 +1238,8 @@ footer{text-align:center;font-family:var(--font-mono);font-size:10.5px;color:var
     </div>
 
     <div class="clue-box">
-      <b>🏆 Leaderboard &amp; timer</b><br>
-      You have <b>60 minutes</b> to reach Treasure Island. Every finished run — win or time-out — is saved to the shared global leaderboard for everyone who plays this game to see.
+      <b>⏱ Timer &amp; submission</b><br>
+      You have <b>60 minutes</b> to reach Treasure Island. When your run ends — win or time-out — your team name, score and time are sent automatically to the organizer. Nothing else to do.
     </div>
 
     <button class="btn btn-block gold" id="closeHowToPlayBtn2">Got it, let's roll! 🤖</button>
@@ -1393,223 +1475,276 @@ let state = {
   treasureCelebrated:false
 };
 
-/* ================= LEADERBOARD STORAGE =================
-   The board is tried in three tiers, best first:
+/* ================= RESULT LOGGING -> GOOGLE SHEET =================
+   When a player finishes (win or time-out), one row is appended to your
+   Google Sheet: date, team, score, islands, time used, hints, skips.
 
-   1. SHARED BOARD (works on GitHub Pages / any static host).
-      Set LB_BOARD_ID below to a jsonblob.com blob id. Free, no signup,
-      no API key. To get an id: open this page once with ?setup=1 on the
-      end of the URL, click "Create shared board", copy the id it shows,
-      and paste it into LB_BOARD_ID. Everyone who opens the page then
-      reads and writes the same board.
-      You can also paste a full https:// URL of your own JSON endpoint
-      (JSONBin, Supabase function, etc.) — it must answer GET with a JSON
-      array and accept PUT of a JSON array.
+   SETUP (once, ~3 minutes) — open this page with ?setup=1 on the end of
+   the URL and it walks you through it, with the script to copy and a
+   working Test button. Short version:
 
-   2. window.storage — only exists inside a Claude Artifact. Not on GitHub.
+     1. Make a Google Sheet.
+     2. Extensions -> Apps Script, paste the code the setup page gives you.
+     3. Deploy -> New deployment -> Web app
+          Execute as: Me        Who has access: Anyone
+     4. Copy the /exec URL and paste it into SHEET_URL below.
 
-   3. localStorage — this browser only. The board shows a loud warning
-      in this mode so nobody thinks it's shared when it isn't.
-========================================================= */
-const LB_BOARD_ID = "";           // <-- paste the id from ?setup=1 here
+   If a player has no internet at the moment they finish, the row is kept
+   in their browser and sent automatically next time they open the game.
+=================================================================== */
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbwL92eq7oeJZ_i22fh62ReDNO5zxIhoflWq1dZIBLr9SA7kmyoMENbMAiOwgXhA7f_O/exec";
 
-const LB_KEY       = 'datahunt_leaderboard';
-const LB_LOCAL_KEY = 'datahunt_leaderboard_local';
-const LB_ID_KEY    = 'datahunt_board_id';
+const SHEET_URL_KEY = 'datahunt_sheet_url';
+const PENDING_KEY   = 'datahunt_pending_results';
 
-let leaderboard = [];   // cached copy of the board {name, score, islands, time}
-let lbMode = 'local';   // 'remote' | 'artifact' | 'local'
-let lbError = '';
-
-/* An id can also arrive in the link (?lb=xxxx) — handy for sharing the
-   board without editing the file. It's remembered for this browser. */
-function resolveBoardId(){
+function resolveSheetUrl(){
   try{
-    const fromUrl = new URLSearchParams(location.search).get('lb');
-    if(fromUrl){ localStorage.setItem(LB_ID_KEY, fromUrl); return fromUrl; }
+    const fromUrl = new URLSearchParams(location.search).get('sheet');
+    if(fromUrl){ localStorage.setItem(SHEET_URL_KEY, fromUrl); return fromUrl; }
   }catch(err){}
-  if(LB_BOARD_ID) return LB_BOARD_ID;
-  try{ return localStorage.getItem(LB_ID_KEY) || ''; }catch(err){ return ''; }
+  if(SHEET_URL) return SHEET_URL;
+  try{ return localStorage.getItem(SHEET_URL_KEY) || ''; }catch(err){ return ''; }
 }
 
-function boardUrl(id){
-  if(/^https?:\/\//i.test(id)) return id;
-  return 'https://jsonblob.com/api/jsonBlob/' + encodeURIComponent(id);
-}
-
-function readLocalBoard(){
-  try{ return JSON.parse(localStorage.getItem(LB_LOCAL_KEY) || '[]'); }
+function readPending(){
+  try{ const v = JSON.parse(localStorage.getItem(PENDING_KEY) || '[]'); return Array.isArray(v) ? v : []; }
   catch(err){ return []; }
 }
-function writeLocalBoard(list){
-  try{ localStorage.setItem(LB_LOCAL_KEY, JSON.stringify(list)); }catch(err){}
+function writePending(list){
+  try{ localStorage.setItem(PENDING_KEY, JSON.stringify(list.slice(-20))); }catch(err){}
+}
+function queueResult(row){
+  const list = readPending();
+  if(!list.some(r=>r.id===row.id)) list.push(row);
+  writePending(list);
+}
+function unqueueResult(id){
+  writePending(readPending().filter(r=>r.id!==id));
 }
 
-function sortTrim(list){
-  list.sort((a,b)=>b.score-a.score);
-  return list.slice(0,50);
-}
-
-/* ---- tier 1: shared remote board ---- */
-async function remoteGet(id){
-  const res = await fetch(boardUrl(id), {
-    method:'GET',
-    headers:{'Accept':'application/json'},
-    cache:'no-store'
+/* Apps Script rejects a JSON content-type preflight, so the body goes as
+   text/plain — the script parses it as JSON on the other side. */
+async function postRow(url, row){
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify(row),
+    redirect: 'follow'
   });
-  if(!res.ok) throw new Error('GET ' + res.status);
-  const data = await res.json();
-  return Array.isArray(data) ? data : (Array.isArray(data.entries) ? data.entries : []);
+  if(!res.ok) throw new Error('HTTP ' + res.status);
+  const text = await res.text();
+  let data = null;
+  try{ data = JSON.parse(text); }catch(err){ /* script returned HTML - treat as ok */ }
+  if(data && data.ok === false) throw new Error(data.error || 'the sheet rejected the row');
+  return true;
 }
-async function remotePut(id, list){
-  const res = await fetch(boardUrl(id), {
-    method:'PUT',
-    headers:{'Content-Type':'application/json','Accept':'application/json'},
-    body: JSON.stringify(list)
+
+/* Some networks block reading the Apps Script response even though the
+   write goes through. no-cors sends the row but hides the reply, so we
+   report it honestly as "sent, could not confirm". */
+async function postRowOpaque(url, row){
+  await fetch(url, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: {'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify(row)
   });
-  if(!res.ok) throw new Error('PUT ' + res.status);
+  return true;
 }
 
-/* ---- tier 2: artifact storage ---- */
-function hasArtifactStorage(){
-  return typeof window.storage === 'object' && window.storage && typeof window.storage.get === 'function';
+function buildResultRow(extra){
+  return Object.assign({
+    id: 'r' + Date.now() + '-' + Math.random().toString(36).slice(2,8),
+    date: new Date().toISOString()
+  }, extra);
 }
 
-async function fetchLeaderboard(){
-  lbError = '';
-  const id = resolveBoardId();
-
-  if(id){
+/* Returns 'saved' | 'sent' | 'queued' */
+async function submitResult(row){
+  const url = resolveSheetUrl();
+  if(!url){ queueResult(row); return 'queued'; }
+  try{
+    await postRow(url, row);
+    unqueueResult(row.id);
+    return 'saved';
+  }catch(err){
+    console.warn('DataHunt sheet write:', err);
     try{
-      leaderboard = sortTrim(await remoteGet(id));
-      lbMode = 'remote';
-      writeLocalBoard(leaderboard);   // offline cache
-      return leaderboard;
-    }catch(err){
-      lbError = 'Shared board unreachable (' + err.message + ')';
-      console.warn('DataHunt leaderboard:', err);
+      await postRowOpaque(url, row);
+      unqueueResult(row.id);
+      return 'sent';
+    }catch(err2){
+      console.warn('DataHunt sheet write (no-cors):', err2);
+      queueResult(row);
+      return 'queued';
     }
   }
-
-  if(hasArtifactStorage()){
-    try{
-      const res = await window.storage.get(LB_KEY, true);
-      leaderboard = (res && res.value) ? sortTrim(JSON.parse(res.value)) : [];
-      lbMode = 'artifact';
-      return leaderboard;
-    }catch(err){
-      lbError = lbError || ('Artifact storage failed (' + err.message + ')');
-    }
-  }
-
-  leaderboard = sortTrim(readLocalBoard());
-  lbMode = 'local';
-  return leaderboard;
 }
 
-function sameEntry(a,b){
-  return a.name===b.name && a.score===b.score && a.time===b.time;
-}
-
-async function pushLeaderboardEntry(entry){
-  const id = resolveBoardId();
-
-  if(id){
-    // Re-read right before writing, so two players finishing at the same
-    // time don't overwrite each other. One retry if the write loses a race.
-    for(let attempt=0; attempt<2; attempt++){
-      try{
-        const current = await remoteGet(id);
-        if(!current.some(e=>sameEntry(e,entry))) current.push(entry);
-        const merged = sortTrim(current);
-        await remotePut(id, merged);
-        leaderboard = merged;
-        lbMode = 'remote';
-        lbError = '';
-        writeLocalBoard(merged);
-        return;
-      }catch(err){
-        lbError = 'Could not save to shared board (' + err.message + ')';
-        console.warn('DataHunt leaderboard write:', err);
-        if(attempt===0) await new Promise(r=>setTimeout(r, 600 + Math.random()*900));
-      }
-    }
+/* On load, try to deliver anything that failed to send last time. */
+async function flushPendingResults(){
+  const url = resolveSheetUrl();
+  if(!url) return;
+  for(const row of readPending()){
+    try{ await postRow(url, row); unqueueResult(row.id); }
+    catch(err){ break; }   // still offline - try again next load
   }
-
-  if(hasArtifactStorage()){
-    try{
-      let current = [];
-      try{
-        const res = await window.storage.get(LB_KEY, true);
-        if(res && res.value) current = JSON.parse(res.value);
-      }catch(err){ current = []; }
-      current.push(entry);
-      const merged = sortTrim(current);
-      await window.storage.set(LB_KEY, JSON.stringify(merged), true);
-      leaderboard = merged;
-      lbMode = 'artifact';
-      lbError = '';
-      return;
-    }catch(err){
-      lbError = lbError || ('Artifact storage failed (' + err.message + ')');
-    }
-  }
-
-  // Last resort: keep the run on this browser so the player still sees it.
-  const local = readLocalBoard();
-  if(!local.some(e=>sameEntry(e,entry))) local.push(entry);
-  leaderboard = sortTrim(local);
-  writeLocalBoard(leaderboard);
-  if(!id) lbMode = 'local';
 }
 
 /* ---- one-time setup screen: ?setup=1 ---- */
+const APPS_SCRIPT_CODE = [
+'function doPost(e) {',
+'  try {',
+'    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Results")',
+'             || SpreadsheetApp.getActiveSpreadsheet().insertSheet("Results");',
+'',
+'    if (sheet.getLastRow() === 0) {',
+'      sheet.appendRow(["Timestamp","Mode","Team / Player","Members","Email IDs","Size",',
+'                       "Score","Islands","Time Used","Hints Used","Skipped","Result"]);',
+'      sheet.getRange(1,1,1,12).setFontWeight("bold");',
+'      sheet.setFrozenRows(1);',
+'    }',
+'',
+'    var d = JSON.parse(e.postData.contents);',
+'    sheet.appendRow([',
+'      new Date(),',
+'      d.mode    || "",',
+'      d.team    || "",',
+'      d.members || "",',
+'      d.emails  || d.email || "",',
+'      d.size    || 1,',
+'      d.score   || 0,',
+'      d.islands || 0,',
+'      d.time    || "",',
+'      d.hints   || 0,',
+'      d.skipped || 0,',
+'      d.outcome || ""',
+'    ]);',
+'',
+'    return ContentService.createTextOutput(JSON.stringify({ok: true}))',
+'      .setMimeType(ContentService.MimeType.JSON);',
+'  } catch (err) {',
+'    return ContentService.createTextOutput(JSON.stringify({ok: false, error: String(err)}))',
+'      .setMimeType(ContentService.MimeType.JSON);',
+'  }',
+'}',
+'',
+'function doGet() {',
+'  return ContentService.createTextOutput(JSON.stringify({ok: true, msg: "DATA HUNT endpoint is live"}))',
+'    .setMimeType(ContentService.MimeType.JSON);',
+'}'
+].join('\n');
+
 async function runBoardSetup(){
+  const isFile = location.protocol === 'file:';
+  // the intro animation sits at z-index 999999 - kill it, the organizer
+  // is here to configure the sheet, not watch a title sequence
+  const intro = document.getElementById('introOverlay');
+  if(intro) intro.remove();
   const wrap = document.createElement('div');
-  wrap.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#07070c;color:#e9e9f5;'
-    + 'font:14px/1.6 ui-monospace,Menlo,Consolas,monospace;padding:28px;overflow:auto;';
-  wrap.innerHTML = '<h1 style="color:#ffd76a;font-size:20px;margin:0 0 6px;">DATA HUNT — shared leaderboard setup</h1>'
-    + '<p style="max-width:70ch;color:#aab;">This creates one shared board on jsonblob.com (free, no account). '
-    + 'Do it once, paste the id into the file, re-upload to GitHub — then every player writes to the same board.</p>'
-    + '<button id="mkBoard" style="background:#ffd76a;color:#111;border:0;border-radius:8px;padding:12px 18px;'
-    + 'font:700 14px ui-monospace,monospace;cursor:pointer;">Create shared board</button>'
-    + '<pre id="mkOut" style="white-space:pre-wrap;margin-top:18px;color:#8ef0c0;"></pre>';
+  wrap.style.cssText = 'position:fixed;inset:0;z-index:2147483647;background:#07070c;color:#e9e9f5;'
+    + 'font:13px/1.65 ui-monospace,Menlo,Consolas,monospace;padding:26px;overflow:auto;';
+
+  const box = 'background:#101018;border:1px solid #2a2a3a;border-radius:10px;padding:16px;margin:14px 0;max-width:92ch;';
+  const btn = 'background:#ffd76a;color:#111;border:0;border-radius:8px;padding:11px 16px;'
+    + 'font:700 13px ui-monospace,monospace;cursor:pointer;margin-right:8px;';
+  const inp = 'width:100%;max-width:70ch;background:#07070c;border:1px solid #3a3a4e;border-radius:7px;'
+    + 'color:#e9e9f5;padding:10px;font:13px ui-monospace,monospace;margin:8px 0;';
+
+  wrap.innerHTML =
+      '<h1 style="color:#ffd76a;font-size:19px;margin:0 0 4px;">DATA HUNT &mdash; Google Sheet setup</h1>'
+    + '<div style="color:#778;font-size:11px;">Page address: ' + escapeHtml(location.href) + '</div>'
+    + (isFile
+        ? '<div style="' + box + 'border-color:#7a4a18;color:#ffb36a;"><b>You opened this file straight from your computer.</b><br>'
+          + 'Results can still be sent from a <code>file://</code> page in most browsers, but to be safe do this setup on your '
+          + '<b>https://yourname.github.io/...</b> link instead.</div>'
+        : '')
+    + '<div style="' + box + '">'
+      + '<div style="color:#ffd76a;font-weight:700;margin-bottom:6px;">Step 1 &mdash; make the sheet</div>'
+      + '<div style="color:#aab;">Open <b>sheets.new</b> and name it anything (e.g. DATA HUNT Results). '
+        + 'You do not need to add any columns &mdash; the script creates the header row itself.</div>'
+    + '</div>'
+    + '<div style="' + box + '">'
+      + '<div style="color:#ffd76a;font-weight:700;margin-bottom:6px;">Step 2 &mdash; paste this into Apps Script</div>'
+      + '<div style="color:#aab;">In the sheet: <b>Extensions &rarr; Apps Script</b>. Delete whatever is there, paste this, press <b>Save</b>.</div>'
+      + '<button id="copyCode" style="' + btn + 'margin-top:10px;">Copy the code</button>'
+      + '<pre id="codeBox" style="white-space:pre;overflow:auto;max-height:260px;background:#07070c;border:1px solid #2a2a3a;'
+        + 'border-radius:7px;padding:12px;margin-top:10px;color:#8ef0c0;font-size:11.5px;"></pre>'
+    + '</div>'
+    + '<div style="' + box + '">'
+      + '<div style="color:#ffd76a;font-weight:700;margin-bottom:6px;">Step 3 &mdash; deploy it</div>'
+      + '<div style="color:#aab;"><b>Deploy &rarr; New deployment</b> &rarr; gear icon &rarr; <b>Web app</b>.<br>'
+        + '&nbsp;&nbsp;Execute as: <b>Me</b><br>'
+        + '&nbsp;&nbsp;Who has access: <b>Anyone</b> &nbsp;<span style="color:#ffb36a;">(not "Anyone with Google account" &mdash; it must be plain Anyone)</span><br>'
+        + 'Press Deploy, allow the permissions Google asks for, then copy the <b>Web app URL</b>. '
+        + 'It ends in <code>/exec</code>.</div>'
+    + '</div>'
+    + '<div style="' + box + '">'
+      + '<div style="color:#ffd76a;font-weight:700;margin-bottom:6px;">Step 4 &mdash; test it</div>'
+      + '<input id="shUrl" placeholder="https://script.google.com/macros/s/AKfy..../exec" value="'
+        + escapeHtml(resolveSheetUrl()) + '" style="' + inp + '">'
+      + '<button id="shTest" style="' + btn + '">Send a test row</button>'
+      + '<pre id="shOut" style="white-space:pre-wrap;margin:12px 0 0;color:#8ef0c0;"></pre>'
+    + '</div>';
   document.body.appendChild(wrap);
 
-  wrap.querySelector('#mkBoard').addEventListener('click', async ()=>{
-    const out = wrap.querySelector('#mkOut');
-    out.style.color = '#8ef0c0';
-    out.textContent = 'Creating…';
+  wrap.querySelector('#codeBox').textContent = APPS_SCRIPT_CODE;
+
+  wrap.querySelector('#copyCode').addEventListener('click', async (ev)=>{
     try{
-      const res = await fetch('https://jsonblob.com/api/jsonBlob', {
-        method:'POST',
-        headers:{'Content-Type':'application/json','Accept':'application/json'},
-        body: JSON.stringify([])
-      });
-      if(!res.ok) throw new Error('HTTP ' + res.status);
-      let id = res.headers.get('x-jsonblob') || '';
-      if(!id){
-        const loc = res.headers.get('location') || '';
-        id = loc.split('/').pop() || '';
-      }
-      if(!id) throw new Error('server did not return an id (headers blocked)');
-      out.textContent =
-        'Board created.\n\n'
-      + 'Board id: ' + id + '\n\n'
-      + 'STEP 1 — open index.html, find this line near the top of the script:\n'
-      + '    const LB_BOARD_ID = "";\n'
-      + 'change it to:\n'
-      + '    const LB_BOARD_ID = "' + id + '";\n\n'
-      + 'STEP 2 — commit and push to GitHub.\n\n'
-      + 'Or, without editing anything, just share this link with players:\n'
-      + location.origin + location.pathname + '?lb=' + id + '\n\n'
-      + 'Check it worked: the leaderboard should say "Global — shared by all players".';
-      try{ localStorage.setItem(LB_ID_KEY, id); }catch(err){}
+      await navigator.clipboard.writeText(APPS_SCRIPT_CODE);
+      ev.target.textContent = 'Copied';
+      setTimeout(()=>{ ev.target.textContent = 'Copy the code'; }, 1800);
     }catch(err){
+      ev.target.textContent = 'Select it below and copy manually';
+    }
+  });
+
+  wrap.querySelector('#shTest').addEventListener('click', async ()=>{
+    const out = wrap.querySelector('#shOut');
+    const url = wrap.querySelector('#shUrl').value.trim();
+    out.style.color = '#8ef0c0';
+    if(!url){ out.style.color = '#ff9b9b'; out.textContent = 'Paste the /exec URL first.'; return; }
+    if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(url)){
+      out.style.color = '#ffb36a';
+      out.textContent = 'That does not look like an Apps Script web app URL.\nIt should look like:\n'
+        + '  https://script.google.com/macros/s/AKfycb....../exec\n\nTrying it anyway...\n';
+    }
+    const testRow = buildResultRow({
+      mode: 'Solo', team: 'TEST ROW (setup)', members: 'TEST ROW (setup)',
+      emails: 'test@example.com', email: 'test@example.com', size: 1,
+      score: 0, islands: 0, time: '00:00', hints: 0, skipped: 0, outcome: 'setup test'
+    });
+    try{
+      out.textContent += 'Sending...';
+      await postRow(url, testRow);
+      out.style.color = '#8ef0c0';
+      out.textContent =
+          'Working. Check your sheet - a row saying "TEST ROW (setup)" should be there.\n'
+        + '(Delete that row before the event.)\n\n'
+        + 'STEP 1 - open index.html, find this line near the top of the script:\n'
+        + '    const SHEET_URL = "";\n'
+        + 'change it to:\n'
+        + '    const SHEET_URL = "' + url + '";\n\n'
+        + 'STEP 2 - commit and push to GitHub. Every finished run now lands in your sheet.';
+      try{ localStorage.setItem(SHEET_URL_KEY, url); }catch(e){}
+    }catch(err){
+      const m = String(err && err.message || err);
       out.style.color = '#ff9b9b';
-      out.textContent = 'Could not create a board: ' + err.message
-        + '\n\njsonblob.com may be blocked on this network. Ask me for the '
-        + 'Firebase / Supabase version instead, or use a different network.';
+      let hint = '';
+      if(/Failed to fetch|NetworkError|Load failed/i.test(m)){
+        hint = '\n\nThe browser could not reach it, or could not read the reply. Check:\n'
+          + '  * Deployment access is set to "Anyone" (NOT "Anyone with Google account").\n'
+          + '  * You copied the /exec URL, not the /dev one.\n'
+          + '  * You pressed Deploy and accepted the Google permission prompt.\n'
+          + '  * No ad-blocker is blocking it - try an incognito window.\n\n'
+          + 'Note: the row may actually have arrived anyway. Check your sheet before retrying.';
+      } else if(/HTTP 401|HTTP 403/.test(m)){
+        hint = '\n\nGoogle refused the request. Re-deploy with "Who has access: Anyone".';
+      } else if(/HTTP 404/.test(m)){
+        hint = '\n\nThat URL does not exist. Deploy -> Manage deployments -> copy the Web app URL again.';
+      }
+      out.textContent += '\nTest failed: ' + m + hint;
     }
   });
 }
@@ -2505,6 +2640,9 @@ function saveProgress(){
   try{
     localStorage.setItem(SAVE_KEY, JSON.stringify({
       team: state.team,
+      mode: state.mode,
+      email: state.email,
+      members: state.members,
       score: state.score,
       completed: [...state.completed],
       skipped: [...state.skipped],
@@ -2539,12 +2677,160 @@ function beginGame(){
   saveProgress();
 }
 
+/* ================= REGISTRATION: SOLO / GROUP ================= */
+state.mode = 'solo';      // 'solo' | 'group'
+state.members = [];       // [{name, email}] - group only
+state.email = '';         // solo only
+
+const soloFields  = document.getElementById('soloFields');
+const groupFields = document.getElementById('groupFields');
+const memberList  = document.getElementById('memberList');
+const formError   = document.getElementById('formError');
+const MAX_MEMBERS = 6;
+const MIN_MEMBERS = 2;
+
+function isEmail(v){
+  return /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(v.trim());
+}
+function showFormError(msg){
+  formError.textContent = msg || '';
+  if(msg){ formError.scrollIntoView({behavior:'smooth', block:'nearest'}); }
+}
+function clearFieldMarks(){
+  document.querySelectorAll('.member-row input.bad, #soloFields input.bad')
+    .forEach(el=>el.classList.remove('bad'));
+}
+
+function addMemberRow(name, email){
+  if(memberList.children.length >= MAX_MEMBERS) return;
+  const row = document.createElement('div');
+  row.className = 'member-row';
+  const n = document.createElement('input');
+  n.type = 'text'; n.placeholder = 'Member name'; n.maxLength = 40; n.value = name || '';
+  const e = document.createElement('input');
+  e.type = 'email'; e.placeholder = 'member@gmail.com'; e.maxLength = 60; e.value = email || '';
+  const del = document.createElement('button');
+  del.type = 'button'; del.className = 'member-del'; del.textContent = '×';
+  del.title = 'Remove this member';
+  del.addEventListener('click', ()=>{
+    if(memberList.children.length <= MIN_MEMBERS){
+      showFormError('A group needs at least ' + MIN_MEMBERS + ' members. Switch to Solo if you are playing alone.');
+      return;
+    }
+    row.remove();
+    syncAddButton();
+    showFormError('');
+  });
+  [n,e].forEach(el=>el.addEventListener('input', ()=>{ el.classList.remove('bad'); showFormError(''); }));
+  row.append(n, e, del);
+  memberList.appendChild(row);
+  syncAddButton();
+  return row;
+}
+
+function syncAddButton(){
+  const btn = document.getElementById('addMemberBtn');
+  const full = memberList.children.length >= MAX_MEMBERS;
+  btn.disabled = full;
+  btn.style.opacity = full ? '.4' : '1';
+  btn.style.cursor = full ? 'not-allowed' : 'pointer';
+  btn.textContent = full ? 'Maximum ' + MAX_MEMBERS + ' members' : '+ Add member';
+}
+
+function readMembers(){
+  return [...memberList.children].map(row=>{
+    const [n,e] = row.querySelectorAll('input');
+    return {name: n.value.trim(), email: e.value.trim(), nEl: n, eEl: e};
+  });
+}
+
+function setMode(mode){
+  state.mode = mode;
+  const solo = mode === 'solo';
+  document.getElementById('modeSolo').classList.toggle('active', solo);
+  document.getElementById('modeGroup').classList.toggle('active', !solo);
+  soloFields.style.display  = solo ? '' : 'none';
+  groupFields.style.display = solo ? 'none' : '';
+  showFormError('');
+  clearFieldMarks();
+  if(!solo && memberList.children.length === 0){
+    for(let i=0;i<MIN_MEMBERS;i++) addMemberRow();
+  }
+}
+
+['modeSolo','modeGroup'].forEach(id=>{
+  const el = document.getElementById(id);
+  const pick = ()=> setMode(id === 'modeSolo' ? 'solo' : 'group');
+  el.addEventListener('click', pick);
+  el.addEventListener('keydown', ev=>{ if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); pick(); } });
+});
+document.getElementById('addMemberBtn').addEventListener('click', ()=>{ addMemberRow(); showFormError(''); });
+syncAddButton();
+
+/* Returns true if the form is good; marks the offending fields if not. */
+function validateRegistration(){
+  clearFieldMarks();
+  if(state.mode === 'solo'){
+    const nEl = document.getElementById('soloName');
+    const eEl = document.getElementById('soloEmail');
+    const name = nEl.value.trim(), email = eEl.value.trim();
+    if(!name){ nEl.classList.add('bad'); nEl.focus(); showFormError('Enter your name so your score can be recorded.'); return false; }
+    if(!email){ eEl.classList.add('bad'); eEl.focus(); showFormError('Enter your email ID.'); return false; }
+    if(!isEmail(email)){ eEl.classList.add('bad'); eEl.focus(); showFormError('That email does not look right — check for a typo.'); return false; }
+    state.team = name;
+    state.email = email;
+    state.members = [{name, email}];
+    return true;
+  }
+
+  const teamEl = document.getElementById('teamNameInput');
+  const team = teamEl.value.trim();
+  if(!team){ teamEl.classList.add('bad'); teamEl.focus(); showFormError('Give your team a name.'); return false; }
+
+  const rows = readMembers();
+  const filled = rows.filter(r=>r.name || r.email);
+  if(filled.length < MIN_MEMBERS){
+    showFormError('A group needs at least ' + MIN_MEMBERS + ' members with a name and email.');
+    const blank = rows.find(r=>!r.name) || rows[0];
+    if(blank){ blank.nEl.classList.add('bad'); blank.nEl.focus(); }
+    return false;
+  }
+  for(const r of filled){
+    if(!r.name){ r.nEl.classList.add('bad'); r.nEl.focus(); showFormError('Every member needs a name.'); return false; }
+    if(!r.email){ r.eEl.classList.add('bad'); r.eEl.focus(); showFormError('Every member needs an email ID — ' + r.name + ' is missing one.'); return false; }
+    if(!isEmail(r.email)){ r.eEl.classList.add('bad'); r.eEl.focus(); showFormError(r.name + "'s email does not look right — check for a typo."); return false; }
+  }
+  const seen = new Set();
+  for(const r of filled){
+    const key = r.email.toLowerCase();
+    if(seen.has(key)){ r.eEl.classList.add('bad'); r.eEl.focus(); showFormError('Two members have the same email (' + r.email + ').'); return false; }
+    seen.add(key);
+  }
+
+  state.team = team;
+  state.email = filled[0].email;   // team lead = first member
+  state.members = filled.map(r=>({name:r.name, email:r.email}));
+  return true;
+}
+
 document.getElementById('startBtn').addEventListener('click', ()=>{
-  const name = document.getElementById('teamNameInput').value.trim() || 'Anonymous Team';
-  state.team = name;
-  document.getElementById('crewVal').textContent = name;
+  if(!validateRegistration()) return;
+  document.getElementById('crewVal').textContent = state.team;
   clearProgress(); // fresh run replaces any old save
   beginGame();
+});
+
+/* Enter key moves the form along instead of doing nothing */
+document.getElementById('startScreen').addEventListener('keydown', ev=>{
+  if(ev.key !== 'Enter') return;
+  const t = ev.target;
+  if(t.tagName !== 'INPUT') return;
+  ev.preventDefault();
+  const inputs = [...document.querySelectorAll('#startScreen input')]
+    .filter(el=>el.offsetParent !== null);
+  const i = inputs.indexOf(t);
+  if(i > -1 && i < inputs.length-1) inputs[i+1].focus();
+  else document.getElementById('startBtn').click();
 });
 
 // offer to resume an interrupted run
@@ -2563,6 +2849,9 @@ document.getElementById('startBtn').addEventListener('click', ()=>{
   btn.innerHTML = `⏯ Resume "${saved.team}" — ${saved.completed.length}/7 solved, ${mins}m left`;
   btn.addEventListener('click', ()=>{
     state.team = saved.team;
+    state.mode = saved.mode || 'solo';
+    state.email = saved.email || '';
+    state.members = saved.members || [];
     state.score = saved.score || 0;
     state.completed = new Set(saved.completed || []);
     state.skipped = new Set(saved.skipped || []);
@@ -2603,13 +2892,17 @@ function finishGame(won){
   let fastBonus = false;
   const badgesPanel = document.getElementById('badgesPanel');
   const badgesList = document.getElementById('badgesList');
+  const sub = document.getElementById('winSubtitle');
   if(!won){
     h2.textContent = "TIME'S UP!";
     chest.textContent = '⏳';
+    sub.textContent = 'The clock beat you to it — you charted ' + state.completed.size
+      + ' of ' + ISLANDS.length + ' locations. Your run still counts.';
     badgesPanel.style.display = 'none';
   } else {
     h2.textContent = 'TREASURE FOUND!';
     chest.textContent = '🏆💰';
+    sub.textContent = "You've explored every location on the map and claimed the treasure.";
     SoundFX.fanfare();
     spawnCoinRain();
     if(timeUsed <= FAST_COMPLETION_SECONDS){
@@ -2625,18 +2918,53 @@ function finishGame(won){
     }
   }
   document.getElementById('finalStats').innerHTML = `
-    Team: <b style="color:#fff">${state.team}</b><br>
+    ${state.mode === 'group' ? 'Team' : 'Player'}: <b style="color:#fff">${state.team}</b><br>
     Islands charted: <b style="color:#fff">${state.completed.size}/7</b><br>
     ${fastBonus ? '⚡ Fast Completion Bonus: <b style="color:var(--ok)">+50</b><br>' : ''}
     Final score: <b style="color:var(--gold)">${state.score}</b><br>
     Time used: <b style="color:#fff">${formatTime(timeUsed)}</b>
   `;
-  document.getElementById('winLbSubtext').textContent = 'Saving your score and pulling up the board…';
+  const statusEl = document.getElementById('submitStatus');
+  const detailEl = document.getElementById('submitDetail');
+  const hintsUsed = Object.keys(state.hintUsed || {}).length;
+  const members = state.members || [];
+  const row = buildResultRow({
+    mode:    state.mode === 'group' ? 'Group' : 'Solo',
+    team:    state.team,
+    email:   state.email || '',
+    members: members.map(m=>m.name).join(', '),
+    emails:  members.map(m=>m.email).join(', '),
+    size:    members.length || 1,
+    score:   state.score,
+    islands: state.completed.size,
+    time:    formatTime(timeUsed),
+    hints:   hintsUsed,
+    skipped: state.skipped.size,
+    outcome: state.completed.size === ISLANDS.length ? 'Completed' : 'Time up'
+  });
+
+  detailEl.innerHTML =
+      (state.mode === 'group' ? 'Team: ' : 'Player: ')
+    + '<b style="color:#fff">' + escapeHtml(state.team) + '</b><br>'
+    + (state.mode === 'group' && members.length
+        ? 'Members: <b style="color:#fff">' + escapeHtml(members.map(m=>m.name).join(', ')) + '</b><br>'
+        : '')
+    + 'Score: <b style="color:var(--gold)">' + state.score + '</b><br>'
+    + 'Time: <b style="color:#fff">' + formatTime(timeUsed) + '</b>';
+
+  statusEl.textContent = 'Sending your score to the organizer…';
   (async ()=>{
-    await pushLeaderboardEntry({name:state.team, score:state.score, islands:state.completed.size, time:formatTime(timeUsed)});
-    renderLeaderboard(true);
-    document.getElementById('winLbSubtext').textContent = 'Your run is highlighted below';
-    const panel = document.getElementById('winLeaderboardPanel');
+    const outcome = await submitResult(row);
+    if(outcome === 'saved'){
+      statusEl.innerHTML = '<span style="color:var(--ok);">✅ Saved. Your result is with the organizer.</span>';
+    } else if(outcome === 'sent'){
+      statusEl.innerHTML = '<span style="color:var(--ok);">✅ Sent to the organizer.</span>';
+    } else {
+      statusEl.innerHTML = '<span style="color:#ffb36a;">⚠️ Could not reach the organizer right now — '
+        + 'your result is saved on this device and will send itself the next time you open the game '
+        + 'with a connection. Show this screen to the organizer if you need it counted now.</span>';
+    }
+    const panel = document.getElementById('submitPanel');
     if(panel) panel.scrollIntoView({behavior:'smooth', block:'center'});
   })();
 }
@@ -2645,83 +2973,15 @@ function escapeHtml(str){
   return String(str).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-function lbStatusHtml(){
-  if(lbMode==='remote'){
-    return '<div style="font-size:10px;letter-spacing:.08em;color:#7df0b8;margin:0 0 8px;">'
-      + '🌐 GLOBAL — shared by all players</div>';
-  }
-  if(lbMode==='artifact'){
-    return '<div style="font-size:10px;letter-spacing:.08em;color:#7df0b8;margin:0 0 8px;">'
-      + '🌐 SHARED BOARD</div>';
-  }
-  return '<div style="font-size:10px;line-height:1.5;color:#ffb36a;margin:0 0 8px;'
-    + 'border:1px solid rgba(255,179,106,.35);border-radius:6px;padding:6px 8px;">'
-    + '⚠️ THIS BROWSER ONLY — not shared yet.'
-    + (lbError ? '<br><span style="color:#ff9b9b;">' + escapeHtml(lbError) + '</span>' : '')
-    + '<br><span style="color:#998;">Organizer: open this page with <b>?setup=1</b> to create the shared board.</span>'
-    + '</div>';
-}
-
-function buildLeaderboardTableHtml(entries, afterFinish){
-  if(entries.length===0){
-    return lbStatusHtml() + '<div class="lb-empty">No runs completed yet — be the first!</div>';
-  }
-  const rows = entries.slice(0,8).map((e,i)=>{
-    const rank = i+1;
-    let rankCell;
-    if(rank===1) rankCell = '<span class="medal gold">1</span>';
-    else if(rank===2) rankCell = '<span class="medal silver">2</span>';
-    else if(rank===3) rankCell = '<span class="medal bronze">3</span>';
-    else rankCell = `<span class="rank-plain">${rank}</span>`;
-    const mine = afterFinish && e.name===state.team && e.score===state.score;
-    return `<tr class="${mine?'me':''}">
-      <td class="rank-cell">${rankCell}</td>
-      <td class="player-cell">${escapeHtml(e.name)}</td>
-      <td class="time-cell">${e.time || '--:--'}</td>
-      <td class="score-cell">${e.score}</td>
-    </tr>`;
-  }).join('');
-  return lbStatusHtml() + `<table class="lb-table">
-    <thead><tr><th>Rank</th><th>Player</th><th>Time</th><th>Score</th></tr></thead>
-    <tbody>${rows}</tbody>
-  </table>`;
-}
-
-function renderLeaderboard(afterFinish){
-  const html = buildLeaderboardTableHtml(leaderboard, afterFinish);
-  const list1 = document.getElementById('leaderboardList');
-  const list2 = document.getElementById('startLeaderboardList');
-  const list3 = document.getElementById('winLeaderboardList');
-  if(list1) list1.innerHTML = html;
-  if(list2) list2.innerHTML = html;
-  if(list3) list3.innerHTML = html;
-}
-
-async function refreshLeaderboardFromStorage(){
-  await fetchLeaderboard();
-  renderLeaderboard(false);
-}
 document.getElementById('maxScoreValStart').textContent = MAX_SCORE;
 document.getElementById('maxScoreValGame').textContent = MAX_SCORE;
-refreshLeaderboardFromStorage();
-
-/* ?setup=1 → one-time shared-board creation screen (organizer only) */
+/* ?setup=1 → organizer's one-time Google Sheet setup walkthrough */
 try{
   if(new URLSearchParams(location.search).get('setup')==='1'){ runBoardSetup(); }
 }catch(err){}
 
-/* While the start screen is up, poll the shared board so a player watching
-   it sees friends appear without hitting Refresh. */
-setInterval(()=>{
-  if(!state.started && lbMode==='remote' && !document.hidden){
-    refreshLeaderboardFromStorage();
-  }
-}, 20000);
-document.addEventListener('visibilitychange', ()=>{
-  if(!document.hidden && !state.started) refreshLeaderboardFromStorage();
-});
-
-document.getElementById('refreshLbBtn').addEventListener('click', refreshLeaderboardFromStorage);
+/* Deliver any result that could not be sent last time (player was offline). */
+flushPendingResults();
 
 document.getElementById('playAgainBtn').addEventListener('click', ()=>{
   state.score = 0;
@@ -2734,7 +2994,9 @@ document.getElementById('playAgainBtn').addEventListener('click', ()=>{
   document.getElementById('timerChip').classList.remove('warn', 'critical');
   document.getElementById('winScreen').classList.remove('show');
   document.getElementById('startScreen').style.display = 'block';
-  document.getElementById('teamNameInput').value = '';
+  // keep the registration filled in - same people usually play again
+  showFormError('');
+  clearFieldMarks();
   renderSkippedPanel();
   updateHud();
 });
